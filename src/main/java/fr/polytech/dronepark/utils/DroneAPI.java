@@ -34,14 +34,15 @@ public class DroneAPI {
         return status;
     }
 
-    public void launchDrone(Drone drone, GregorianCalendar launchHour) throws ExternalDroneApiException {
+    public boolean launchDrone(Drone drone, GregorianCalendar launchHour) throws ExternalDroneApiException {
 
-        DroneStatus status = getDroneStatus(drone);
-        if (status == null) {
-            return;
-        }
-        if (status != DroneStatus.BACK_FROM_DELIVERY) {
-            return;
+        try {
+            DroneStatus status = getDroneStatus(drone);
+            if (status != null && status != DroneStatus.BACK_FROM_DELIVERY) {
+                return false;
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
         }
 
         String launchHourString = launchHour.get(GregorianCalendar.HOUR) + ":"
@@ -57,6 +58,7 @@ public class DroneAPI {
         } catch (Exception e) {
             throw new ExternalDroneApiException(url + "/drone/launch", e);
         }
+        return true;
     }
 
 }

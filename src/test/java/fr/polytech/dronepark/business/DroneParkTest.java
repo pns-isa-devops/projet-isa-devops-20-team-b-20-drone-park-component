@@ -3,6 +3,7 @@ package fr.polytech.dronepark.business;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.GregorianCalendar;
 
@@ -37,7 +38,7 @@ public class DroneParkTest extends AbstractDroneParkTest {
         droneAvailable.setDroneStatus(DroneStatus.AVAILABLE);
         DroneAPI mocked = mock(DroneAPI.class);
         droneLauncher.useDroneParkReference(mocked);
-        doNothing().when(mocked).launchDrone(droneAvailable, new GregorianCalendar());
+        when(mocked.launchDrone(droneAvailable, new GregorianCalendar())).thenReturn(true);
     }
 
     @Test

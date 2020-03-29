@@ -43,11 +43,12 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone {
     @Override
     public boolean initializeDroneLaunching(final Drone drone, final GregorianCalendar launchHour)
             throws ExternalDroneApiException {
+        boolean status;
         // Call the dotnet API
-        this.droneAPI.launchDrone(drone, launchHour);
+        status = this.droneAPI.launchDrone(drone, launchHour);
         scheduler.add(drone);
         drone.setDroneStatus(DroneStatus.ON_DELIVERY);
-        return false;
+        return status;
     }
 
     @PostConstruct
@@ -58,7 +59,7 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone {
         try {
             Properties prop = new Properties();
             prop.load(this.getClass().getResourceAsStream("/dronepark.properties"));
-            droneAPI = new DroneAPI(prop.getProperty("carrierHostName"), prop.getProperty("carrierPortNumber"));
+            droneAPI = new DroneAPI(prop.getProperty("droneparkHostName"), prop.getProperty("droneparkPortNumber"));
         } catch (Exception e) {
             log.log(Level.INFO, "Cannot read dronepark.properties file", e);
             throw new UncheckedException(e);
