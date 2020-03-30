@@ -12,6 +12,7 @@ import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 
 import fr.polytech.dronepark.exception.ExternalDroneApiException;
+import fr.polytech.entities.DeliveryStatus;
 import fr.polytech.entities.Drone;
 import fr.polytech.entities.DroneStatus;
 
@@ -42,9 +43,12 @@ public class DroneScheduler {
     @Schedule(hour = "*", minute = "*", second = "1")
     public void processReturn() throws ExternalDroneApiException {
         for (Iterator<Drone> it = drones.iterator(); it.hasNext();) {
-            DroneStatus status = droneAPI.getDroneStatus(it.next());
-            if (status == DroneStatus.BACK_FROM_DELIVERY) {
-                log.log(Level.INFO, "Drone [" + it.next().getDroneId() + "] is back from delivery");
+            DeliveryStatus status = droneAPI.getDeliveryStatus(it.next());
+            if (status == DeliveryStatus.FAILED) {
+                log.log(Level.INFO, "Drone [" + it.next().getDroneId() + "] has failed the delivery");
+                it.remove();
+            } else if (status == DeliveryStatus.DELIVERED) {
+                log.log(Level.INFO, "Drone [" + it.next().getDroneId() + "] has delivered successfully");
                 it.remove();
             }
         }

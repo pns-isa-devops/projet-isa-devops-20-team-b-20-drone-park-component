@@ -8,6 +8,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.json.JSONObject;
 
 import fr.polytech.dronepark.exception.ExternalDroneApiException;
+import fr.polytech.entities.DeliveryStatus;
 import fr.polytech.entities.Drone;
 import fr.polytech.entities.DroneStatus;
 
@@ -28,6 +29,24 @@ public class DroneAPI {
         try {
             String response = WebClient.create(url).path("/drone/" + drone.getDroneId() + "/status").get(String.class);
             status = DroneStatus.valueOf(new JSONObject(response).getString("status"));
+        } catch (Exception e) {
+            throw new ExternalDroneApiException(url + "/drone/" + drone.getDroneId() + "/status", e);
+        }
+        return status;
+    }
+
+    /**
+     * retrieve the status of a delivery from a drone job
+     *
+     * @param drone
+     * @return
+     * @throws ExternalDroneApiException
+     */
+    public DeliveryStatus getDeliveryStatus(Drone drone) throws ExternalDroneApiException {
+        DeliveryStatus status = null;
+        try {
+            String response = WebClient.create(url).path("/drone/" + drone.getDroneId() + "/status").get(String.class);
+            status = DeliveryStatus.valueOf(new JSONObject(response).getString("delivery"));
         } catch (Exception e) {
             throw new ExternalDroneApiException(url + "/drone/" + drone.getDroneId() + "/status", e);
         }
