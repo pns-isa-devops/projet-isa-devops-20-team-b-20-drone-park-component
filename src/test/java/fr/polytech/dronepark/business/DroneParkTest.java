@@ -72,7 +72,7 @@ public class DroneParkTest extends AbstractDroneParkTest {
     }
 
     @Test
-    public void initializeDroneLaunchingTest() throws ExternalDroneApiException {
+    public void initializeDroneLaunchingTest() throws Exception {
         Drone droneTest = entityManager.merge(drone);
         droneTest.setDroneStatus(DroneStatus.AVAILABLE);
 
@@ -82,7 +82,7 @@ public class DroneParkTest extends AbstractDroneParkTest {
     }
 
     @Test
-    public void initializeDroneLaunchingOtherDateTest() throws ExternalDroneApiException {
+    public void initializeDroneLaunchingOtherDateTest() throws Exception {
         Drone droneTest = entityManager.merge(drone);
         droneTest.setDroneStatus(DroneStatus.AVAILABLE);
 

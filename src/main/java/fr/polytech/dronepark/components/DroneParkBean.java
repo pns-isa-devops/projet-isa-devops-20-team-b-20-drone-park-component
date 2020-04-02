@@ -46,7 +46,7 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone {
      * @throws ExternalDroneApiException
      */
     @Override
-    public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour) throws ExternalDroneApiException {
+    public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour) throws Exception {
         Drone drone = entityManager.merge(d);
         boolean status;
         // Call the dotnet API
