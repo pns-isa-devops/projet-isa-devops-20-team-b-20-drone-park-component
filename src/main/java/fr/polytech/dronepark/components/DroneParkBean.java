@@ -8,6 +8,8 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.apache.cxf.common.i18n.UncheckedException;
 
@@ -21,6 +23,9 @@ import fr.polytech.entities.DroneStatus;
 public class DroneParkBean implements DroneLauncher, ControlledDrone {
 
     private static final Logger log = Logger.getLogger(Logger.class.getName());
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private DroneAPI droneAPI;
 
@@ -41,8 +46,8 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone {
      * @throws ExternalDroneApiException
      */
     @Override
-    public boolean initializeDroneLaunching(final Drone drone, final GregorianCalendar launchHour)
-            throws ExternalDroneApiException {
+    public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour) throws ExternalDroneApiException {
+        Drone drone = entityManager.merge(d);
         boolean status;
         // Call the dotnet API
         status = this.droneAPI.launchDrone(drone, launchHour);
