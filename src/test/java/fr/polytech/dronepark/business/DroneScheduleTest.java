@@ -64,7 +64,7 @@ public class DroneScheduleTest extends AbstractDroneParkTest {
         schedule.add(d1, entityManager);
         schedule.runProcess(entityManager);
 
-        assertNull((Drone) entityManager.find(Drone.class, d1.getId()));
+        assertNotNull((Drone) entityManager.find(Drone.class, d1.getId()));
         assertNotNull((Drone) entityManager.find(Drone.class, d2.getId()));
         assertNotNull((Drone) entityManager.find(Drone.class, d3.getId()));
         assertNotNull((Drone) entityManager.find(Drone.class, d4.getId()));
@@ -74,17 +74,17 @@ public class DroneScheduleTest extends AbstractDroneParkTest {
         schedule.runProcess(entityManager);
         schedule.runProcess(entityManager);
 
-        assertNull((Drone) entityManager.find(Drone.class, d1.getId()));
-        assertNull((Drone) entityManager.find(Drone.class, d2.getId()));
+        assertNotNull((Drone) entityManager.find(Drone.class, d1.getId()));
+        assertNotNull((Drone) entityManager.find(Drone.class, d2.getId()));
         assertNotNull((Drone) entityManager.find(Drone.class, d3.getId()));
-        assertNull((Drone) entityManager.find(Drone.class, d4.getId()));
+        assertNotNull((Drone) entityManager.find(Drone.class, d4.getId()));
 
         schedule.add(d3, entityManager);
         schedule.runProcess(entityManager);
 
-        assertNull((Drone) entityManager.find(Drone.class, d1.getId()));
-        assertNull((Drone) entityManager.find(Drone.class, d2.getId()));
+        assertNotNull((Drone) entityManager.find(Drone.class, d1.getId()));
+        assertNotNull((Drone) entityManager.find(Drone.class, d2.getId()));
         assertNotNull((Drone) entityManager.find(Drone.class, d3.getId()));
-        assertNull((Drone) entityManager.find(Drone.class, d4.getId()));
+        assertNotNull((Drone) entityManager.find(Drone.class, d4.getId()));
     }
 }

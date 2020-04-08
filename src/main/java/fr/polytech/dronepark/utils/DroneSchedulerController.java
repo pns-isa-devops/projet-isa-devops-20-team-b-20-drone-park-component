@@ -38,11 +38,9 @@ public class DroneSchedulerController {
             if (status == DeliveryStatus.FAILED) {
                 log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] has failed the delivery");
                 it.remove();
-                entityManager.remove(drone);
             } else if (status == DeliveryStatus.DELIVERED) {
                 log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] has delivered successfully");
                 it.remove();
-                entityManager.remove(drone);
             }
         }
     }
