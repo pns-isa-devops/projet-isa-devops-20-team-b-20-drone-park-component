@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.UserTransaction;
 
+import fr.polytech.entities.Delivery;
 import fr.polytech.entities.DeliveryStatus;
 import fr.polytech.entities.Drone;
 
@@ -35,13 +36,24 @@ public class DroneSchedulerController {
         for (Iterator<Drone> it = drones.iterator(); it.hasNext();) {
             Drone drone = entityManager.merge(it.next());
             DeliveryStatus status = droneAPI.getDeliveryStatus(drone);
-            if (status == DeliveryStatus.FAILED) {
-                log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] has failed the delivery");
-                it.remove();
-            } else if (status == DeliveryStatus.DELIVERED) {
-                log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] has delivered successfully");
-                it.remove();
+            Delivery currentDelivery = entityManager.merge(drone.getCurrentDelivery());
+            switch (status){
+                case FAILED:
+                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] has failed the delivery");
+                    break;
+                case NOT_DELIVERED:
+                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] is back with the delivery (not delivered)");
+                    break;
+                case DELIVERED:
+                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] has delivered successfully");
+                    break;
+                default:
+                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] hasn't returned any information");
             }
+            it.remove();
+            currentDelivery.setStatus(status);
+            entityManager.persist(currentDelivery);
+
         }
     }
 }

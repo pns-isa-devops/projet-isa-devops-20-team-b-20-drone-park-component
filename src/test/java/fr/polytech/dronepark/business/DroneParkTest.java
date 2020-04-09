@@ -1,6 +1,7 @@
 package fr.polytech.dronepark.business;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +13,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.UserTransaction;
 
+import fr.polytech.entities.Delivery;
+import fr.polytech.entities.Parcel;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.transaction.api.annotation.TransactionMode;
 import org.jboss.arquillian.transaction.api.annotation.Transactional;
@@ -44,6 +47,7 @@ public class DroneParkTest extends AbstractDroneParkTest {
     private UserTransaction utx;
 
     Drone drone;
+    Delivery delivery;
 
     @Before
     public void setUpContext() throws Exception {
@@ -56,12 +60,18 @@ public class DroneParkTest extends AbstractDroneParkTest {
         utx.begin();
         drone = entityManager.merge(drone);
         entityManager.remove(drone);
+       /* delivery = entityManager.merge(delivery);
+        entityManager.remove(delivery);*/
         utx.commit();
     }
 
     private void initDate() {
         drone = new Drone("123");
         entityManager.persist(drone);
+        // Create a delivery
+        delivery = new Delivery("DELIVERY22");
+        delivery.setParcel(new Parcel( "123456789A", "Rue test", "DHS", "AlexHey"));
+      //  entityManager.persist(delivery);
     }
 
     private void initMock() throws ExternalDroneApiException {
@@ -71,13 +81,16 @@ public class DroneParkTest extends AbstractDroneParkTest {
         when(mocked.launchDrone(drone, new GregorianCalendar())).thenReturn(true);
     }
 
+
+
+
     @Test
     public void initializeDroneLaunchingTest() throws Exception {
         Drone droneTest = entityManager.merge(drone);
         droneTest.setDroneStatus(DroneStatus.AVAILABLE);
 
         assertEquals(DroneStatus.AVAILABLE, droneTest.getDroneStatus());
-        droneLauncher.initializeDroneLaunching(droneTest, new GregorianCalendar());
+        droneLauncher.initializeDroneLaunching(droneTest, new GregorianCalendar(), delivery);
         assertEquals(DroneStatus.ON_DELIVERY, droneTest.getDroneStatus());
     }
 
@@ -87,7 +100,9 @@ public class DroneParkTest extends AbstractDroneParkTest {
         droneTest.setDroneStatus(DroneStatus.AVAILABLE);
 
         assertEquals(DroneStatus.AVAILABLE, droneTest.getDroneStatus());
-        droneLauncher.initializeDroneLaunching(droneTest, new GregorianCalendar(2020, 3, 19, 18, 37));
+        droneLauncher.initializeDroneLaunching(droneTest, new GregorianCalendar(2020, 3, 19, 18, 37),delivery);
         assertEquals(DroneStatus.ON_DELIVERY, droneTest.getDroneStatus());
     }
+
+
 }

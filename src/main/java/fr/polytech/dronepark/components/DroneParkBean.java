@@ -11,6 +11,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import fr.polytech.entities.Delivery;
 import org.apache.cxf.common.i18n.UncheckedException;
 
 import fr.polytech.dronepark.exception.ExternalDroneApiException;
@@ -46,13 +47,16 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone {
      * @throws ExternalDroneApiException
      */
     @Override
-    public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour) throws Exception {
+    public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour, Delivery deliv) throws Exception {
         Drone drone = entityManager.merge(d);
+        Delivery delivery = entityManager.merge(deliv);
         boolean status;
         // Call the dotnet API
         status = this.droneAPI.launchDrone(drone, launchHour);
         scheduler.add(drone);
         drone.setDroneStatus(DroneStatus.ON_DELIVERY);
+        drone.setCurrentDelivery(delivery);
+        entityManager.persist(drone);
         return status;
     }
 

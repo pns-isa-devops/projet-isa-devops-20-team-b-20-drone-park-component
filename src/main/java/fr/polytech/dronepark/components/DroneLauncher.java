@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 import javax.ejb.Local;
 
 import fr.polytech.dronepark.exception.ExternalDroneApiException;
+import fr.polytech.entities.Delivery;
 import fr.polytech.entities.Drone;
 
 @Local
@@ -18,6 +19,6 @@ public interface DroneLauncher {
      * @return
      * @throws ExternalDroneApiException
      */
-    boolean initializeDroneLaunching(Drone drone, GregorianCalendar launchHour) throws Exception;
+    boolean initializeDroneLaunching(Drone drone, GregorianCalendar launchHour, Delivery delivery) throws Exception;
 
 }
