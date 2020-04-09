@@ -52,6 +52,8 @@ public class DroneSchedulerController {
             }
             it.remove();
             currentDelivery.setStatus(status);
+            drone.setCurrentDelivery(null);
+            entityManager.persist(drone);
             entityManager.persist(currentDelivery);
 
         }

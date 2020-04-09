@@ -120,11 +120,16 @@ public class DroneScheduleTest extends AbstractDroneParkTest {
         Delivery del4Stored = entityManager.merge(del4);
         assertEquals(DeliveryStatus.NOT_DELIVERED,del4Stored.getStatus());
 
+        assertNull(d2.getCurrentDelivery());
+        assertNotNull(d3.getCurrentDelivery());
+        assertNull(d4.getCurrentDelivery());
+
         schedule.add(d3, entityManager);
         schedule.runProcess(entityManager);
 
         del3Stored = entityManager.merge(del3);
         assertEquals(DeliveryStatus.ONGOING,del3Stored.getStatus());
+        assertNull(d3.getCurrentDelivery());
 
     }
 
