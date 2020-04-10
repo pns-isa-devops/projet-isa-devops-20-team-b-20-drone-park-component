@@ -118,7 +118,7 @@ pipeline{
                                 echo "Check dependency on ${components[i]}"
                                 build job: "${components[i]}/develop",
                                     parameters: [string(name: 'DEPENDENCY', value: "${COMPONENT}"),
-                                    string(name: 'VERSION', value: "${CURRENT_VERSION}"),
+                                    string(name: "UPDATE_VERSION", value: "${CURRENT_VERSION}"),
                                     string(name: 'TYPE', value: 'snapshot')],
                                     propagate: false,
                                     wait: false
