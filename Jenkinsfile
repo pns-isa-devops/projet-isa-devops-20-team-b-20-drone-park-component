@@ -8,18 +8,26 @@ pipeline{
     }
     parameters {
         string(name: 'DEPENDENCY', defaultValue: '', description: 'dependency to update')
-        choice(name: 'VERSION', choices: ['none', 'snapshot', 'release'], description: 'type of version to update')
+        string(name: 'VERSION', defaultValue: '', description: 'version of the dependency')
+        choice(name: 'TYPE', choices: ['none', 'snapshot', 'release'], description: 'type of version to update')
     }
     environment {
         MVN_SETTING_PROVIDER = "3ec57b41-efe6-4628-a6c7-8be5f1c26d77"
         COMPONENT = "projet-isa-devops-20-team-b-20-drone-park-component"
     }
     stages {
-        stage('snapshot version') {
+        stage("Snapshot revision") {
+            environment {
+                CURRENT_VERSION = '''${sh(
+                                    returnStdout: true,
+                                    script: "mvn help:evaluate -Dexpression=versions.${DEPENDENCY} -q -DforceStdout
+                                )}'''
+            }
             when {
                 allOf {
+                    expression { params.VERSION != CURRENT_VERSION}
                     expression { params.DEPENDENCY != '' }
-                    expression { params.VERSION == 'snapshot' }
+                    expression { params.TYPE == 'snapshot' }
                 }
             }
             steps {
@@ -87,6 +95,12 @@ pipeline{
             }
         }
         stage('Update snapshot dependencies') {
+            environment {
+                CURRENT_VERSION = '''${sh(
+                                    returnStdout: true,
+                                    script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout"
+                                )}'''
+            }
             when {
                 allOf {
                     not { branch 'master' }
@@ -95,12 +109,13 @@ pipeline{
             }
             steps {
                 script {
-                    def components = ['projet-isa-devops-20-team-b-20-web-service','projet-isa-devops-20-team-b-20-shipment-component']
+                    def components = ['projet-isa-devops-20-team-b-20-shipment-component']
                     for (int i = 0; i < components.size(); ++i) {
                         echo "Check dependency on ${components[i]}"
                         build job: "${components[i]}/develop",
                             parameters: [string(name: 'DEPENDENCY', value: "${COMPONENT}"),
-                            string(name: 'VERSION', value: 'snapshot')],
+                            string(name: 'VERSION', value: "${CURRENT_VERSION}"),
+                            string(name: 'TYPE', value: 'snapshot')],
                             propagate: false,
                             wait: false
                     }
@@ -111,7 +126,7 @@ pipeline{
             when {
                 allOf {
                     expression { params.DEPENDENCY != '' }
-                    expression { params.VERSION == 'snapshot' }
+                    expression { params.TYPE == 'snapshot' }
                 }
             }
             steps {
