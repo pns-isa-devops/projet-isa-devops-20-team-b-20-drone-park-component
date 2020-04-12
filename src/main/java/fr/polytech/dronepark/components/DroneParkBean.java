@@ -21,7 +21,7 @@ import fr.polytech.entities.Drone;
 import fr.polytech.entities.DroneStatus;
 
 @Stateless
-public class DroneParkBean implements DroneLauncher, ControlledDrone {
+public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneReviewer {
 
     private static final Logger log = Logger.getLogger(Logger.class.getName());
 
@@ -42,7 +42,7 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone {
      * Initializes drone launching by sending the launch signal to the drone at the
      * right time.
      *
-     * @param drone
+     * @param d a drone
      * @return
      * @throws ExternalDroneApiException
      */
@@ -75,4 +75,9 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone {
         }
     }
 
+    @Override
+    public void addDrone() {
+        //TODO implement!
+        throw new UnsupportedOperationException();
+    }
 }
