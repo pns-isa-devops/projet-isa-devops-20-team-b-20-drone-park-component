@@ -96,4 +96,16 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
         entityManager.persist(drone);
         return true;
     }
+
+    @Override
+    public boolean setDroneAvailable(String droneId) {
+        // If we use the Drone.droneId field instead of Drone.id use the bellow
+       /* Drone drone = (Drone) entityManager.createQuery("SELECT * FROM Drone where Drone.droneId = :value1")
+                .setParameter("value1", droneId).getSingleResult();*/
+        Drone drone  = entityManager.find(Drone.class,droneId);
+        if(drone == null) return false;
+        drone.setDroneStatus(DroneStatus.AVAILABLE);
+        entityManager.persist(drone);
+        return true;
+    }
 }

@@ -19,4 +19,11 @@ public interface DroneReviewer {
      * @return
      */
     boolean putDroneInRevision(String droneId);
+
+    /**
+     * Set the drone with the id "drone_id" in available state
+     * @param droneId
+     * @return
+     */
+    boolean setDroneAvailable(String droneId);
 }
