@@ -136,7 +136,7 @@ pipeline{
                     }
                     steps {
                         script {
-                            update = "\n - Component can be update : ${params.DEPENDENCY}\n\t${params.UPDATE_VERSION} -> ${VERSION}"
+                            update = "\n - Component can be update : ${params.DEPENDENCY}\n\t${VERSION} -> ${params.UPDATE_VERSION}"
                         }
                     }
                 }
