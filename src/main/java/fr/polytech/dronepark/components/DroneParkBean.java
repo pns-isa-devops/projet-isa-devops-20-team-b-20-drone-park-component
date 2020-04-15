@@ -21,7 +21,7 @@ import fr.polytech.entities.Drone;
 import fr.polytech.entities.DroneStatus;
 
 @Stateless
-public class DroneParkBean implements DroneLauncher, ControlledDrone {
+public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneReviewer {
 
     private static final Logger log = Logger.getLogger(Logger.class.getName());
 
@@ -40,11 +40,12 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone {
 
     /**
      * Initializes drone launching by sending the launch signal to the drone at the
-     * right time.
+     *      * right time.
      *
-     * @param drone
+     * @param d
+     * @param launchHour
      * @return
-     * @throws ExternalDroneApiException
+     * @throws Exception
      */
     @Override
     public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour, Delivery deliv) throws Exception {
@@ -75,4 +76,40 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone {
         }
     }
 
+
+    @Override
+    public boolean setDroneInCharge(String droneId) {
+        // If we use the Drone.droneId field instead of Drone.id use the bellow
+       /* Drone drone = (Drone) entityManager.createQuery("SELECT * FROM Drone where Drone.droneId = :value1")
+                .setParameter("value1", droneId).getSingleResult();*/
+        Drone drone  = entityManager.find(Drone.class,droneId);
+        if(drone == null) return false;
+        drone.setDroneStatus(DroneStatus.ON_CHARGE);
+        entityManager.persist(drone);
+        return true;
+    }
+
+    @Override
+    public boolean putDroneInRevision(String droneId) {
+        // If we use the Drone.droneId field instead of Drone.id use the bellow
+       /* Drone drone = (Drone) entityManager.createQuery("SELECT * FROM Drone where Drone.droneId = :value1")
+                .setParameter("value1", droneId).getSingleResult();*/
+        Drone drone  = entityManager.find(Drone.class,droneId);
+        if(drone == null) return false;
+        drone.setDroneStatus(DroneStatus.ON_REPAIR);
+        entityManager.persist(drone);
+        return true;
+    }
+
+    @Override
+    public boolean setDroneAvailable(String droneId) {
+        // If we use the Drone.droneId field instead of Drone.id use the bellow
+       /* Drone drone = (Drone) entityManager.createQuery("SELECT * FROM Drone where Drone.droneId = :value1")
+                .setParameter("value1", droneId).getSingleResult();*/
+        Drone drone  = entityManager.find(Drone.class,droneId);
+        if(drone == null) return false;
+        drone.setDroneStatus(DroneStatus.AVAILABLE);
+        entityManager.persist(drone);
+        return true;
+    }
 }
