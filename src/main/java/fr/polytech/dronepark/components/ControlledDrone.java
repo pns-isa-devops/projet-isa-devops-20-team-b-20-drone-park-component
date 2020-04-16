@@ -8,7 +8,7 @@ import fr.polytech.dronepark.utils.DroneAPI;
  * ControlledDrone
  */
 @Local
-public interface ControlledDrone extends DroneLauncher {
+public interface ControlledDrone extends DroneLauncher, DroneReviewer {
 
     void useDroneParkReference(DroneAPI dronepark);
 

@@ -1,19 +1,12 @@
 package fr.polytech.dronepark.business;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.GregorianCalendar;
-
-import javax.ejb.EJB;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.UserTransaction;
-
+import arquillian.AbstractDroneParkTest;
+import fr.polytech.dronepark.components.ControlledDrone;
+import fr.polytech.dronepark.exception.ExternalDroneApiException;
+import fr.polytech.dronepark.utils.DroneAPI;
 import fr.polytech.entities.Delivery;
+import fr.polytech.entities.Drone;
+import fr.polytech.entities.DroneStatus;
 import fr.polytech.entities.Parcel;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.transaction.api.annotation.TransactionMode;
@@ -23,12 +16,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import arquillian.AbstractDroneParkTest;
-import fr.polytech.dronepark.components.ControlledDrone;
-import fr.polytech.dronepark.exception.ExternalDroneApiException;
-import fr.polytech.dronepark.utils.DroneAPI;
-import fr.polytech.entities.Drone;
-import fr.polytech.entities.DroneStatus;
+import javax.ejb.EJB;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.transaction.UserTransaction;
+import java.util.GregorianCalendar;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * DronePark
@@ -37,17 +36,14 @@ import fr.polytech.entities.DroneStatus;
 @Transactional(TransactionMode.COMMIT)
 public class DroneParkTest extends AbstractDroneParkTest {
 
-    @EJB
-    private ControlledDrone droneLauncher;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    @Inject
-    private UserTransaction utx;
-
     Drone drone;
     Delivery delivery;
+    @EJB
+    private ControlledDrone controlledDrone;
+    @PersistenceContext
+    private EntityManager entityManager;
+    @Inject
+    private UserTransaction utx;
 
     @Before
     public void setUpContext() throws Exception {
@@ -70,18 +66,16 @@ public class DroneParkTest extends AbstractDroneParkTest {
         entityManager.persist(drone);
         // Create a delivery
         delivery = new Delivery("DELIVERY22");
-        delivery.setParcel(new Parcel( "123456789A", "Rue test", "DHS", "AlexHey"));
-      //  entityManager.persist(delivery);
+        delivery.setParcel(new Parcel("123456789A", "Rue test", "DHS", "AlexHey"));
+        //  entityManager.persist(delivery);
     }
 
     private void initMock() throws ExternalDroneApiException {
         drone.setDroneStatus(DroneStatus.AVAILABLE);
         DroneAPI mocked = mock(DroneAPI.class);
-        droneLauncher.useDroneParkReference(mocked);
+        controlledDrone.useDroneParkReference(mocked);
         when(mocked.launchDrone(drone, new GregorianCalendar())).thenReturn(true);
     }
-
-
 
 
     @Test
@@ -90,7 +84,7 @@ public class DroneParkTest extends AbstractDroneParkTest {
         droneTest.setDroneStatus(DroneStatus.AVAILABLE);
 
         assertEquals(DroneStatus.AVAILABLE, droneTest.getDroneStatus());
-        droneLauncher.initializeDroneLaunching(droneTest, new GregorianCalendar(), delivery);
+        controlledDrone.initializeDroneLaunching(droneTest, new GregorianCalendar(), delivery);
         assertEquals(DroneStatus.ON_DELIVERY, droneTest.getDroneStatus());
     }
 
@@ -100,8 +94,17 @@ public class DroneParkTest extends AbstractDroneParkTest {
         droneTest.setDroneStatus(DroneStatus.AVAILABLE);
 
         assertEquals(DroneStatus.AVAILABLE, droneTest.getDroneStatus());
-        droneLauncher.initializeDroneLaunching(droneTest, new GregorianCalendar(2020, 3, 19, 18, 37),delivery);
+        controlledDrone.initializeDroneLaunching(droneTest, new GregorianCalendar(2020, 3, 19, 18, 37), delivery);
         assertEquals(DroneStatus.ON_DELIVERY, droneTest.getDroneStatus());
+    }
+
+    @Test
+    public void addDrone() {
+        Drone stored = entityManager.find(Drone.class, drone.getId());
+        assertNotNull(stored);
+        this.controlledDrone.addDrone();
+        Query query = entityManager.createQuery("select d from Drone d where d.droneId='000'");
+        assertEquals(new Drone("000"), query.getSingleResult());
     }
 
 
