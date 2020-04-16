@@ -68,7 +68,10 @@ public class DroneAPI {
                 + launchHour.get(GregorianCalendar.MINUTE);
 
         // Build request
-        JSONObject request = new JSONObject().put("id", drone.getDroneId()).put("hour", launchHourString);
+        JSONObject request = new JSONObject()
+                                    .put("id", drone.getDroneId())
+                                    .put("hour", launchHourString)
+                                    .put("destination", drone.getCurrentDelivery().getParcel().getAddress());
 
         // Launch
         try {
