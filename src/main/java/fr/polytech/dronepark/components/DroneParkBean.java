@@ -77,8 +77,8 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
 
     @Override
     public void addDrone() {
-        //TODO implement!
-        throw new UnsupportedOperationException();
+        Drone drone = new Drone();
+        entityManager.persist(drone);
     }
 
 
