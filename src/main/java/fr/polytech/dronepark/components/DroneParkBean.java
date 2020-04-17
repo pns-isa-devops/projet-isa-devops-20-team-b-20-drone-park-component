@@ -1,6 +1,7 @@
 package fr.polytech.dronepark.components;
 
 import java.util.GregorianCalendar;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,8 +10,14 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
+import fr.polytech.dronepark.exception.DroneNotFoundException;
 import fr.polytech.entities.Delivery;
 import org.apache.cxf.common.i18n.UncheckedException;
 
@@ -39,9 +46,9 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
 
     /**
      * Initializes drone launching by sending the launch signal to the drone at the
-     *      * right time.
+     * * right time.
      *
-     * @param d a drone
+     * @param d          a drone
      * @param launchHour
      * @return
      * @throws Exception
@@ -83,38 +90,47 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
 
 
     @Override
-    public boolean setDroneInCharge(String droneId) {
-        // If we use the Drone.droneId field instead of Drone.id use the bellow
-       /* Drone drone = (Drone) entityManager.createQuery("SELECT * FROM Drone where Drone.droneId = :value1")
-                .setParameter("value1", droneId).getSingleResult();*/
-        Drone drone  = entityManager.find(Drone.class,droneId);
-        if(drone == null) return false;
-        drone.setDroneStatus(DroneStatus.ON_CHARGE);
-        entityManager.persist(drone);
-        return true;
+    public void setDroneInCharge(String droneId) throws DroneNotFoundException {
+        setDroneStatus(droneId,DroneStatus.ON_CHARGE);
+
+    }
+
+    private Optional<Drone> findById(String id) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Drone> criteria = builder.createQuery(Drone.class);
+        Root<Drone> root = criteria.from(Drone.class);
+        criteria.select(root).where(builder.equal(root.get("droneId"), id));
+
+        TypedQuery<Drone> query = entityManager.createQuery(criteria);
+        try {
+            return Optional.of(query.getSingleResult());
+        } catch (NoResultException e) {
+            log.log(Level.FINEST, "No result for [" + id + "]", e);
+            return Optional.empty();
+        }
+    }
+
+
+    @Override
+    public void putDroneInRevision(String droneId) throws DroneNotFoundException {
+        setDroneStatus(droneId,DroneStatus.ON_REPAIR);
+
+
+
     }
 
     @Override
-    public boolean putDroneInRevision(String droneId) {
-        // If we use the Drone.droneId field instead of Drone.id use the bellow
-       /* Drone drone = (Drone) entityManager.createQuery("SELECT * FROM Drone where Drone.droneId = :value1")
-                .setParameter("value1", droneId).getSingleResult();*/
-        Drone drone  = entityManager.find(Drone.class,droneId);
-        if(drone == null) return false;
-        drone.setDroneStatus(DroneStatus.ON_REPAIR);
-        entityManager.persist(drone);
-        return true;
+    public void setDroneAvailable(String droneId) throws DroneNotFoundException {
+       setDroneStatus(droneId,DroneStatus.AVAILABLE);
     }
 
-    @Override
-    public boolean setDroneAvailable(String droneId) {
-        // If we use the Drone.droneId field instead of Drone.id use the bellow
-       /* Drone drone = (Drone) entityManager.createQuery("SELECT * FROM Drone where Drone.droneId = :value1")
-                .setParameter("value1", droneId).getSingleResult();*/
-        Drone drone  = entityManager.find(Drone.class,droneId);
-        if(drone == null) return false;
-        drone.setDroneStatus(DroneStatus.AVAILABLE);
-        entityManager.persist(drone);
-        return true;
+    private void setDroneStatus(String droneId, DroneStatus droneStatus)throws DroneNotFoundException{
+        if (findById(droneId).isPresent()) {
+            Drone drone = findById(droneId).get();
+            drone.setDroneStatus(droneStatus);
+            entityManager.persist(drone);
+        } else {
+            throw new DroneNotFoundException(droneId);
+        }
     }
 }

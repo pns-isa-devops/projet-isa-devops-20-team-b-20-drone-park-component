@@ -1,5 +1,7 @@
 package fr.polytech.dronepark.components;
 
+import fr.polytech.dronepark.exception.DroneNotFoundException;
+
 import javax.ejb.Local;
 
 @Local
@@ -15,20 +17,20 @@ public interface DroneReviewer {
      * @param droneId
      * @return
      */
-    boolean setDroneInCharge(String droneId);
+    void setDroneInCharge(String droneId)throws DroneNotFoundException;
 
     /**
      * Set the drone with the id "drone_id" in repair state
      * @param droneId
      * @return
      */
-    boolean putDroneInRevision(String droneId);
+    void putDroneInRevision(String droneId)throws DroneNotFoundException;
 
     /**
      * Set the drone with the id "drone_id" in available state
      * @param droneId
      * @return
      */
-    boolean setDroneAvailable(String droneId);
+    void setDroneAvailable(String droneId) throws DroneNotFoundException;
 
 }
