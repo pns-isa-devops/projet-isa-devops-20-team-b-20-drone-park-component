@@ -114,9 +114,6 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
     @Override
     public void putDroneInRevision(String droneId) throws DroneNotFoundException {
         setDroneStatus(droneId,DroneStatus.ON_REPAIR);
-
-
-
     }
 
     @Override
