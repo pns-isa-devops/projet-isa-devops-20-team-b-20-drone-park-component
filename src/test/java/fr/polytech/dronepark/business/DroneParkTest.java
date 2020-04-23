@@ -3,6 +3,7 @@ package fr.polytech.dronepark.business;
 import arquillian.AbstractDroneParkTest;
 import fr.polytech.dronepark.components.ControlledDrone;
 import fr.polytech.dronepark.exception.ExternalDroneApiException;
+import fr.polytech.dronepark.exception.InvalidDroneIDException;
 import fr.polytech.dronepark.utils.DroneAPI;
 import fr.polytech.entities.Delivery;
 import fr.polytech.entities.Drone;
@@ -25,6 +26,7 @@ import javax.transaction.UserTransaction;
 import java.util.GregorianCalendar;
 
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -98,12 +100,13 @@ public class DroneParkTest extends AbstractDroneParkTest {
     }
 
     @Test
-    public void addDrone() {
+    public void addDrone() throws Exception{
         Drone stored = entityManager.find(Drone.class, drone.getId());
         assertNotNull(stored);
         this.controlledDrone.addDrone("000");
         Query query = entityManager.createQuery("select d from Drone d where d.droneId='000'");
         assertEquals(new Drone("000"), query.getSingleResult());
+        assertThrows(InvalidDroneIDException.class, () -> this.controlledDrone.addDrone("000"));
     }
 
 

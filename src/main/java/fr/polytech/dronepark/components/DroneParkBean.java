@@ -1,6 +1,7 @@
 package fr.polytech.dronepark.components;
 
 import java.util.GregorianCalendar;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -9,15 +10,13 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import fr.polytech.dronepark.exception.DroneNotFoundException;
+import fr.polytech.dronepark.exception.InvalidDroneIDException;
 import fr.polytech.entities.Delivery;
 import org.apache.cxf.common.i18n.UncheckedException;
 
@@ -83,16 +82,23 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
     }
 
     @Override
-    public void addDrone(String droneId) {
-        Drone drone = new Drone(droneId);
-        entityManager.persist(drone);
+    public void addDrone(String droneId) throws InvalidDroneIDException {
+
+            Long nb = (Long) entityManager.createQuery("select count(d) from Drone d where d.droneId='"+droneId+"'").getSingleResult();
+
+            if(nb == 0){
+                Drone drone = new Drone(droneId);
+                entityManager.persist(drone);
+            }else{
+                throw new InvalidDroneIDException(droneId);
+            }
+
     }
 
 
     @Override
     public void setDroneInCharge(String droneId) throws DroneNotFoundException {
         setDroneStatus(droneId,DroneStatus.ON_CHARGE);
-
     }
 
     private Optional<Drone> findById(String id) {

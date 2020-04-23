@@ -1,6 +1,7 @@
 package fr.polytech.dronepark.components;
 
 import fr.polytech.dronepark.exception.DroneNotFoundException;
+import fr.polytech.dronepark.exception.InvalidDroneIDException;
 
 import javax.ejb.Local;
 
@@ -10,7 +11,7 @@ public interface DroneReviewer {
     /**
      * Adds a drone to the drone park.
      */
-    void addDrone(String droneId);
+    void addDrone(String droneId) throws InvalidDroneIDException;
 
     /**
      * Set the drone with the id "drone_id" in charge state
