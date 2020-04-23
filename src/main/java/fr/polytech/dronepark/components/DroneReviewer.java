@@ -10,7 +10,7 @@ public interface DroneReviewer {
     /**
      * Adds a drone to the drone park.
      */
-    void addDrone();
+    void addDrone(String droneId);
 
     /**
      * Set the drone with the id "drone_id" in charge state

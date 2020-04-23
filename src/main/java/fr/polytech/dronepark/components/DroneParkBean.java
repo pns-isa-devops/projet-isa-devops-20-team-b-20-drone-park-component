@@ -83,8 +83,8 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
     }
 
     @Override
-    public void addDrone() {
-        Drone drone = new Drone("000");
+    public void addDrone(String droneId) {
+        Drone drone = new Drone(droneId);
         entityManager.persist(drone);
     }
 

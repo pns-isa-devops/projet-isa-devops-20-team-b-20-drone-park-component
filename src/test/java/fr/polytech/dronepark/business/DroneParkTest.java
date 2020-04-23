@@ -24,8 +24,7 @@ import javax.persistence.Query;
 import javax.transaction.UserTransaction;
 import java.util.GregorianCalendar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -102,7 +101,7 @@ public class DroneParkTest extends AbstractDroneParkTest {
     public void addDrone() {
         Drone stored = entityManager.find(Drone.class, drone.getId());
         assertNotNull(stored);
-        this.controlledDrone.addDrone();
+        this.controlledDrone.addDrone("000");
         Query query = entityManager.createQuery("select d from Drone d where d.droneId='000'");
         assertEquals(new Drone("000"), query.getSingleResult());
     }
