@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.UserTransaction;
 
+import fr.polytech.dronepark.exception.ExternalDroneApiException;
 import fr.polytech.entities.Delivery;
 import fr.polytech.entities.DeliveryStatus;
 import fr.polytech.entities.Drone;
@@ -26,13 +27,13 @@ public class DroneSchedulerController {
         this.droneAPI = droneAPI;
     }
 
-    public void add(Drone d, EntityManager entityManager) throws Exception {
+    public void add(Drone d, EntityManager entityManager) {
         Drone drone = entityManager.merge(d);
         log.log(Level.INFO, "Drone [" + d.getDroneId() + "] in Delivery");
         drones.add(drone);
     }
 
-    public void runProcess(EntityManager entityManager) throws Exception {
+    public void runProcess(EntityManager entityManager) throws ExternalDroneApiException {
         for (Iterator<Drone> it = drones.iterator(); it.hasNext();) {
             Drone drone = entityManager.merge(it.next());
             DeliveryStatus status = droneAPI.getDeliveryStatus(drone);

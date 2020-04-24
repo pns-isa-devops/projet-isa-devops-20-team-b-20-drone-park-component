@@ -1,42 +1,40 @@
 package fr.polytech.dronepark.components;
 
+import fr.polytech.dronepark.exception.DroneNotFoundException;
+import fr.polytech.dronepark.exception.ExternalDroneApiException;
+import fr.polytech.dronepark.exception.InvalidDroneIDException;
+import fr.polytech.dronepark.utils.DroneAPI;
+import fr.polytech.dronepark.utils.DroneScheduler;
+import fr.polytech.entities.Delivery;
+import fr.polytech.entities.Drone;
+import fr.polytech.entities.DroneStatus;
+import org.apache.cxf.common.i18n.UncheckedException;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.GregorianCalendar;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import fr.polytech.dronepark.exception.DroneNotFoundException;
-import fr.polytech.dronepark.exception.InvalidDroneIDException;
-import fr.polytech.entities.Delivery;
-import org.apache.cxf.common.i18n.UncheckedException;
-
-import fr.polytech.dronepark.utils.DroneAPI;
-import fr.polytech.dronepark.utils.DroneScheduler;
-import fr.polytech.entities.Drone;
-import fr.polytech.entities.DroneStatus;
-
 @Stateless
 public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneReviewer {
 
     private static final Logger log = Logger.getLogger(Logger.class.getName());
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    private DroneAPI droneAPI;
-
     @EJB
     DroneScheduler scheduler;
+    @PersistenceContext
+    private EntityManager entityManager;
+    private DroneAPI droneAPI;
 
     @Override
     public void useDroneParkReference(DroneAPI dronepark) {
@@ -47,13 +45,13 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
      * Initializes drone launching by sending the launch signal to the drone at the
      * * right time.
      *
-     * @param d          a drone
+     * @param d a drone
      * @param launchHour
      * @return
      * @throws Exception
      */
     @Override
-    public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour, Delivery deliv) throws Exception {
+    public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour, Delivery deliv) throws ExternalDroneApiException {
         Drone drone = entityManager.merge(d);
         Delivery delivery = entityManager.merge(deliv);
         boolean status;
@@ -83,22 +81,19 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
 
     @Override
     public void addDrone(String droneId) throws InvalidDroneIDException {
+        Long nb = (Long) entityManager.createQuery("select count(d) from Drone d where d.droneId='" + droneId + "'").getSingleResult();
 
-            Long nb = (Long) entityManager.createQuery("select count(d) from Drone d where d.droneId='"+droneId+"'").getSingleResult();
-
-            if(nb == 0){
-                Drone drone = new Drone(droneId);
-                entityManager.persist(drone);
-            }else{
-                throw new InvalidDroneIDException(droneId);
-            }
-
+        if (nb == 0) {
+            Drone drone = new Drone(droneId);
+            entityManager.persist(drone);
+        } else {
+            throw new InvalidDroneIDException(droneId);
+        }
     }
-
 
     @Override
     public void setDroneInCharge(String droneId) throws DroneNotFoundException {
-        setDroneStatus(droneId,DroneStatus.ON_CHARGE);
+        setDroneStatus(droneId, DroneStatus.ON_CHARGE);
     }
 
     private Optional<Drone> findById(String id) {
@@ -119,15 +114,15 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
 
     @Override
     public void putDroneInRevision(String droneId) throws DroneNotFoundException {
-        setDroneStatus(droneId,DroneStatus.ON_REPAIR);
+        setDroneStatus(droneId, DroneStatus.ON_REPAIR);
     }
 
     @Override
     public void setDroneAvailable(String droneId) throws DroneNotFoundException {
-       setDroneStatus(droneId,DroneStatus.AVAILABLE);
+        setDroneStatus(droneId, DroneStatus.AVAILABLE);
     }
 
-    private void setDroneStatus(String droneId, DroneStatus droneStatus)throws DroneNotFoundException{
+    private void setDroneStatus(String droneId, DroneStatus droneStatus) throws DroneNotFoundException {
         if (findById(droneId).isPresent()) {
             Drone drone = findById(droneId).get();
             drone.setDroneStatus(droneStatus);

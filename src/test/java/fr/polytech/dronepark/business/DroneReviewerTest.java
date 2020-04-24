@@ -39,7 +39,6 @@ public class DroneReviewerTest extends AbstractDroneParkTest {
     public void setup(){
         this.drone = new Drone("001");
         entityManager.persist(drone);
-
     }
 
     @Test

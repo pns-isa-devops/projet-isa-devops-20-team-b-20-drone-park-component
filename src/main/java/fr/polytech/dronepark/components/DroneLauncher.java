@@ -19,6 +19,6 @@ public interface DroneLauncher {
      * @return
      * @throws ExternalDroneApiException
      */
-    boolean initializeDroneLaunching(Drone drone, GregorianCalendar launchHour, Delivery delivery) throws Exception;
+    boolean initializeDroneLaunching(Drone drone, GregorianCalendar launchHour, Delivery delivery) throws ExternalDroneApiException;
 
 }

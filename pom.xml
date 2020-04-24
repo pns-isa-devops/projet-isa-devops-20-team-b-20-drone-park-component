@@ -9,7 +9,7 @@
 
 
     <artifactId>projet-isa-devops-20-team-b-20-drone-park-component</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
 
     <properties>
         <versions.projet-isa-devops-20-team-b-20-entities>1.3-SNAPSHOT</versions.projet-isa-devops-20-team-b-20-entities>

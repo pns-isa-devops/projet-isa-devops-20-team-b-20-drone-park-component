@@ -7,6 +7,7 @@ import javax.ejb.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import fr.polytech.dronepark.exception.ExternalDroneApiException;
 import fr.polytech.entities.Drone;
 
 /**
@@ -29,12 +30,12 @@ public class DroneScheduler {
         controller = new DroneSchedulerController(droneAPI);
     }
 
-    public void add(Drone d) throws Exception {
+    public void add(Drone d) {
         controller.add(d, entityManager);
     }
 
     @Schedule(hour = "*", minute = "*", second = "1")
-    public void processReturn() throws Exception {
+    public void processReturn() throws ExternalDroneApiException {
         controller.runProcess(entityManager);
     }
 }

@@ -22,10 +22,11 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.transaction.UserTransaction;
+import javax.transaction.*;
 import java.util.GregorianCalendar;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -47,13 +48,13 @@ public class DroneParkTest extends AbstractDroneParkTest {
     private UserTransaction utx;
 
     @Before
-    public void setUpContext() throws Exception {
+    public void setUpContext() throws ExternalDroneApiException {
         initDate();
         initMock();
     }
 
     @After
-    public void cleanUpContext() throws Exception {
+    public void cleanUpContext() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
         utx.begin();
         drone = entityManager.merge(drone);
         entityManager.remove(drone);
@@ -80,7 +81,7 @@ public class DroneParkTest extends AbstractDroneParkTest {
 
 
     @Test
-    public void initializeDroneLaunchingTest() throws Exception {
+    public void initializeDroneLaunchingTest() throws ExternalDroneApiException {
         Drone droneTest = entityManager.merge(drone);
         droneTest.setDroneStatus(DroneStatus.AVAILABLE);
 
@@ -90,7 +91,7 @@ public class DroneParkTest extends AbstractDroneParkTest {
     }
 
     @Test
-    public void initializeDroneLaunchingOtherDateTest() throws Exception {
+    public void initializeDroneLaunchingOtherDateTest() throws ExternalDroneApiException {
         Drone droneTest = entityManager.merge(drone);
         droneTest.setDroneStatus(DroneStatus.AVAILABLE);
 
@@ -100,7 +101,7 @@ public class DroneParkTest extends AbstractDroneParkTest {
     }
 
     @Test
-    public void addDrone() throws Exception{
+    public void addDrone() throws InvalidDroneIDException {
         Drone stored = entityManager.find(Drone.class, drone.getId());
         assertNotNull(stored);
         this.controlledDrone.addDrone("000");
