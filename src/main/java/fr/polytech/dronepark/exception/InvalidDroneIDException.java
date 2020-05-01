@@ -8,7 +8,7 @@ public class InvalidDroneIDException extends Exception implements Serializable {
 
     String badDroneID;
 
-    public InvalidDroneIDException(String badDroneID){
+    public InvalidDroneIDException(String badDroneID) {
         this.badDroneID = badDroneID;
     }
 
@@ -18,6 +18,6 @@ public class InvalidDroneIDException extends Exception implements Serializable {
 
     @Override
     public String getMessage() {
-        return "Entered drone ID : " + badDroneID + "is no good !";
+        return "Drone Id unavailable : " + badDroneID + "  (already taken) ";
     }
 }
