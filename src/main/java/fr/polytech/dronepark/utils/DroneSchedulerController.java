@@ -15,6 +15,7 @@ import fr.polytech.dronepark.exception.ExternalDroneApiException;
 import fr.polytech.entities.Delivery;
 import fr.polytech.entities.DeliveryStatus;
 import fr.polytech.entities.Drone;
+import fr.polytech.entities.DroneStatus;
 
 public class DroneSchedulerController {
 
@@ -40,10 +41,10 @@ public class DroneSchedulerController {
             Delivery currentDelivery = entityManager.merge(drone.getCurrentDelivery());
             switch (status){
                 case FAILED:
-                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] has failed the delivery");
+                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] is back with the delivery (not delivered)");
                     break;
                 case NOT_DELIVERED:
-                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] is back with the delivery (not delivered)");
+                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] hasn't been delivered yet");
                     break;
                 case DELIVERED:
                     log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] has delivered successfully");
@@ -54,6 +55,7 @@ public class DroneSchedulerController {
             it.remove();
             currentDelivery.setStatus(status);
             drone.setCurrentDelivery(null);
+            drone.setDroneStatus(DroneStatus.AVAILABLE);
             entityManager.persist(drone);
             entityManager.persist(currentDelivery);
 
