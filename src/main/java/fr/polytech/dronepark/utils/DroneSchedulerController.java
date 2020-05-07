@@ -6,10 +6,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.UserTransaction;
 
 import fr.polytech.dronepark.exception.ExternalDroneApiException;
 import fr.polytech.entities.Delivery;
@@ -39,26 +36,16 @@ public class DroneSchedulerController {
             Drone drone = entityManager.merge(it.next());
             DeliveryStatus status = droneAPI.getDeliveryStatus(drone);
             Delivery currentDelivery = entityManager.merge(drone.getCurrentDelivery());
-            switch (status){
-                case FAILED:
-                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] is back with the delivery (not delivered)");
-                    break;
-                case NOT_DELIVERED:
-                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] hasn't been delivered yet");
-                    break;
-                case DELIVERED:
-                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] has delivered successfully");
-                    break;
-                default:
-                    log.log(Level.INFO, "Drone [" + drone.getDroneId() + "] hasn't returned any information");
+            if (status == DeliveryStatus.FAILED || status == DeliveryStatus.DELIVERED) {
+                it.remove();
+                currentDelivery.setStatus(status);
+                drone.setCurrentDelivery(null);
+                drone.setDroneStatus(DroneStatus.AVAILABLE);
+                log.log(Level.INFO,
+                        "Drone [" + drone.getDroneId() + "] "
+                                + (status == DeliveryStatus.FAILED ? "is back with the delivery (not delivered)"
+                                        : "has delivered successfully"));
             }
-            it.remove();
-            currentDelivery.setStatus(status);
-            drone.setCurrentDelivery(null);
-            drone.setDroneStatus(DroneStatus.AVAILABLE);
-            entityManager.persist(drone);
-            entityManager.persist(currentDelivery);
-
         }
     }
 }
