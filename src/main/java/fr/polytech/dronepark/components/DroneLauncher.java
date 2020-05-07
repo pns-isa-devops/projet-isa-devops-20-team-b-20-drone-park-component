@@ -4,6 +4,7 @@ import java.util.GregorianCalendar;
 
 import javax.ejb.Local;
 
+import fr.polytech.dronepark.exception.DroneNotAvailableException;
 import fr.polytech.dronepark.exception.ExternalDroneApiException;
 import fr.polytech.entities.Delivery;
 import fr.polytech.entities.Drone;
@@ -18,7 +19,9 @@ public interface DroneLauncher {
      * @param drone
      * @return
      * @throws ExternalDroneApiException
+     * @throws DroneNotAvailableException
      */
-    boolean initializeDroneLaunching(Drone drone, GregorianCalendar launchHour, Delivery delivery) throws ExternalDroneApiException;
+    boolean initializeDroneLaunching(Drone drone, GregorianCalendar launchHour, Delivery delivery)
+            throws ExternalDroneApiException, DroneNotAvailableException;
 
 }

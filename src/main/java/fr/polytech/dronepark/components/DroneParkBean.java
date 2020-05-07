@@ -1,5 +1,6 @@
 package fr.polytech.dronepark.components;
 
+import fr.polytech.dronepark.exception.DroneNotAvailableException;
 import fr.polytech.dronepark.exception.DroneNotFoundException;
 import fr.polytech.dronepark.exception.ExternalDroneApiException;
 import fr.polytech.dronepark.exception.InvalidDroneIDException;
@@ -45,22 +46,23 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
      * Initializes drone launching by sending the launch signal to the drone at the
      * * right time.
      *
-     * @param d a drone
+     * @param d          a drone
      * @param launchHour
      * @return
+     * @throws DroneNotAvailableException
      * @throws Exception
      */
     @Override
-    public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour, Delivery deliv) throws ExternalDroneApiException {
+    public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour, Delivery deliv)
+            throws ExternalDroneApiException, DroneNotAvailableException {
         Drone drone = entityManager.merge(d);
         Delivery delivery = entityManager.merge(deliv);
         boolean status;
         // Call the dotnet API
-        status = this.droneAPI.launchDrone(drone, launchHour);
+        status = this.droneAPI.launchDrone(drone, launchHour, delivery);
         scheduler.add(drone);
         drone.setDroneStatus(DroneStatus.ON_DELIVERY);
         drone.setCurrentDelivery(delivery);
-        entityManager.persist(drone);
         return status;
     }
 
@@ -81,7 +83,8 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
 
     @Override
     public void addDrone(String droneId) throws InvalidDroneIDException {
-        Long nb = (Long) entityManager.createQuery("select count(d) from Drone d where d.droneId='" + droneId + "'").getSingleResult();
+        Long nb = (Long) entityManager.createQuery("select count(d) from Drone d where d.droneId='" + droneId + "'")
+                .getSingleResult();
 
         if (nb == 0) {
             Drone drone = new Drone(droneId);
@@ -110,7 +113,6 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
             return Optional.empty();
         }
     }
-
 
     @Override
     public void putDroneInRevision(String droneId) throws DroneNotFoundException {

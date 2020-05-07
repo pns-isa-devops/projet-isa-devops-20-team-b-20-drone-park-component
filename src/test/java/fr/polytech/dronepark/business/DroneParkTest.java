@@ -2,6 +2,7 @@ package fr.polytech.dronepark.business;
 
 import arquillian.AbstractDroneParkTest;
 import fr.polytech.dronepark.components.ControlledDrone;
+import fr.polytech.dronepark.exception.DroneNotAvailableException;
 import fr.polytech.dronepark.exception.ExternalDroneApiException;
 import fr.polytech.dronepark.exception.InvalidDroneIDException;
 import fr.polytech.dronepark.utils.DroneAPI;
@@ -48,18 +49,20 @@ public class DroneParkTest extends AbstractDroneParkTest {
     private UserTransaction utx;
 
     @Before
-    public void setUpContext() throws ExternalDroneApiException {
+    public void setUpContext() throws ExternalDroneApiException, DroneNotAvailableException {
         initDate();
         initMock();
     }
 
     @After
-    public void cleanUpContext() throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException, RollbackException {
+    public void cleanUpContext() throws SystemException, NotSupportedException, HeuristicRollbackException,
+            HeuristicMixedException, RollbackException {
         utx.begin();
         drone = entityManager.merge(drone);
         entityManager.remove(drone);
-       /* delivery = entityManager.merge(delivery);
-        entityManager.remove(delivery);*/
+        /*
+         * delivery = entityManager.merge(delivery); entityManager.remove(delivery);
+         */
         utx.commit();
     }
 
@@ -69,19 +72,18 @@ public class DroneParkTest extends AbstractDroneParkTest {
         // Create a delivery
         delivery = new Delivery("DELIVERY22");
         delivery.setParcel(new Parcel("123456789A", "Rue test", "DHS", "AlexHey"));
-        //  entityManager.persist(delivery);
+        // entityManager.persist(delivery);
     }
 
-    private void initMock() throws ExternalDroneApiException {
+    private void initMock() throws ExternalDroneApiException, DroneNotAvailableException {
         drone.setDroneStatus(DroneStatus.AVAILABLE);
         DroneAPI mocked = mock(DroneAPI.class);
         controlledDrone.useDroneParkReference(mocked);
-        when(mocked.launchDrone(drone, new GregorianCalendar())).thenReturn(true);
+        when(mocked.launchDrone(drone, new GregorianCalendar(), delivery)).thenReturn(true);
     }
 
-
     @Test
-    public void initializeDroneLaunchingTest() throws ExternalDroneApiException {
+    public void initializeDroneLaunchingTest() throws ExternalDroneApiException, DroneNotAvailableException {
         Drone droneTest = entityManager.merge(drone);
         droneTest.setDroneStatus(DroneStatus.AVAILABLE);
 
@@ -91,7 +93,7 @@ public class DroneParkTest extends AbstractDroneParkTest {
     }
 
     @Test
-    public void initializeDroneLaunchingOtherDateTest() throws ExternalDroneApiException {
+    public void initializeDroneLaunchingOtherDateTest() throws ExternalDroneApiException, DroneNotAvailableException {
         Drone droneTest = entityManager.merge(drone);
         droneTest.setDroneStatus(DroneStatus.AVAILABLE);
 
@@ -109,6 +111,5 @@ public class DroneParkTest extends AbstractDroneParkTest {
         assertEquals(new Drone("000"), query.getSingleResult());
         assertThrows(InvalidDroneIDException.class, () -> this.controlledDrone.addDrone("000"));
     }
-
 
 }
