@@ -1,6 +1,5 @@
 package fr.polytech.dronepark.utils;
 
-import fr.polytech.dronepark.exception.DroneNotAvailableException;
 import fr.polytech.dronepark.exception.ExternalDroneApiException;
 import fr.polytech.entities.Delivery;
 import fr.polytech.entities.DeliveryStatus;
@@ -14,6 +13,8 @@ import javax.ws.rs.core.MediaType;
 import java.util.GregorianCalendar;
 
 public class DroneAPI {
+    private static final String DRONE_ADDRESS = "/drone/";
+    private static final String STATUS_ADDRESS = "/status";
     private String url;
 
     public DroneAPI(String host, String port) {
@@ -28,12 +29,12 @@ public class DroneAPI {
         // Retrieving the drone status
         DroneStatus status = null;
         try {
-            String response = WebClient.create(url).path("/drone/" + drone.getDroneId() + "/status").get(String.class);
+            String response = WebClient.create(url).path(DRONE_ADDRESS + drone.getDroneId() + STATUS_ADDRESS).get(String.class);
             status = DroneStatus.valueOf(new JSONObject(response).getString("status"));
         } catch (NotFoundException e) {
             return null;
         } catch (Exception e) {
-            throw new ExternalDroneApiException(url + "/drone/" + drone.getDroneId() + "/status", e);
+            throw new ExternalDroneApiException(url + DRONE_ADDRESS + drone.getDroneId() + STATUS_ADDRESS, e);
         }
         return status;
     }
@@ -48,18 +49,18 @@ public class DroneAPI {
     public DeliveryStatus getDeliveryStatus(Drone drone) throws ExternalDroneApiException {
         DeliveryStatus status = null;
         try {
-            String response = WebClient.create(url).path("/drone/" + drone.getDroneId() + "/status").get(String.class);
+            String response = WebClient.create(url).path(DRONE_ADDRESS + drone.getDroneId() + STATUS_ADDRESS).get(String.class);
             status = DeliveryStatus.valueOf(new JSONObject(response).getString("delivery"));
         } catch (NotFoundException e) {
             return null;
         } catch (Exception e) {
-            throw new ExternalDroneApiException(url + "/drone/" + drone.getDroneId() + "/status", e);
+            throw new ExternalDroneApiException(url + DRONE_ADDRESS + drone.getDroneId() + STATUS_ADDRESS, e);
         }
         return status;
     }
 
     public boolean launchDrone(Drone drone, GregorianCalendar launchHour, Delivery delivery)
-            throws ExternalDroneApiException, DroneNotAvailableException {
+            throws ExternalDroneApiException {
         DroneStatus status = getDroneStatus(drone);
         if (status != null && status != DroneStatus.AVAILABLE) {
             return false;
@@ -76,7 +77,7 @@ public class DroneAPI {
             WebClient.create(url).path("/drone/launch").accept(MediaType.APPLICATION_JSON_TYPE)
                     .header("Content-Type", MediaType.APPLICATION_JSON).post(request.toString(), String.class);
         } catch (Exception e) {
-            throw new ExternalDroneApiException(url + "/drone/" + drone.getDroneId() + "/launch", e);
+            throw new ExternalDroneApiException(url + DRONE_ADDRESS + drone.getDroneId() + "/launch", e);
         }
         return true;
     }

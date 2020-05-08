@@ -9,7 +9,6 @@ import fr.polytech.dronepark.utils.DroneScheduler;
 import fr.polytech.entities.Delivery;
 import fr.polytech.entities.Drone;
 import fr.polytech.entities.DroneStatus;
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;
 
 import javax.annotation.PostConstruct;
