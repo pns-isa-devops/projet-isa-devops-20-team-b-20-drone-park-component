@@ -45,23 +45,23 @@ public class DroneReviewerTest extends AbstractDroneParkTest {
     public void chargeDrone() throws DroneNotFoundException {
         drone = entityManager.merge(drone);
         droneReviewer.setDroneInCharge(drone.getDroneId());
-        drone = entityManager.merge(drone);
         assertEquals(DroneStatus.ON_CHARGE,drone.getDroneStatus());
     }
 
     @Test
     public void reviseDrone()throws DroneNotFoundException{
         drone = entityManager.merge(drone);
-        droneReviewer.putDroneInRevision(drone.getDroneId());
+        drone.setFlightTime(10);
         drone = entityManager.merge(drone);
+        droneReviewer.putDroneInRevision(drone.getDroneId());
         assertEquals(DroneStatus.ON_REPAIR,drone.getDroneStatus());
+        assertEquals(0,drone.getFlightTime());
 
     }
     @Test
     public void setDroneAvailable() throws DroneNotFoundException{
         drone = entityManager.merge(drone);
         droneReviewer.putDroneInRevision(drone.getDroneId());
-        drone = entityManager.merge(drone);
         droneReviewer.setDroneAvailable(drone.getDroneId());
         assertEquals(DroneStatus.AVAILABLE,drone.getDroneStatus());
     }

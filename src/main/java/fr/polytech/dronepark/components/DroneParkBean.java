@@ -6,7 +6,10 @@ import fr.polytech.dronepark.exception.ExternalDroneApiException;
 import fr.polytech.dronepark.exception.InvalidDroneIDException;
 import fr.polytech.dronepark.utils.DroneAPI;
 import fr.polytech.dronepark.utils.DroneScheduler;
-import fr.polytech.entities.*;
+import fr.polytech.entities.Delivery;
+import fr.polytech.entities.Drone;
+import fr.polytech.entities.DroneStatus;
+import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;
 
 import javax.annotation.PostConstruct;
@@ -20,7 +23,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.GregorianCalendar;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -100,10 +102,28 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
 
     @Override
     public void setDroneInCharge(String droneId) throws DroneNotFoundException {
-        setDroneStatus(droneId, DroneStatus.ON_CHARGE);
+        Drone drone = this.findById(droneId);
+        drone = entityManager.merge(drone);
+        drone.setDroneStatus(DroneStatus.ON_CHARGE);
     }
 
-    private Optional<Drone> findById(String id) {
+    @Override
+    public void putDroneInRevision(String droneId) throws DroneNotFoundException {
+        Drone drone = this.findById(droneId);
+        drone = entityManager.merge(drone);
+        drone.setDroneStatus(DroneStatus.ON_REPAIR);
+        drone.setFlightTime(0);
+    }
+
+    @Override
+    public void setDroneAvailable(String droneId) throws DroneNotFoundException {
+        Drone drone = this.findById(droneId);
+        drone = entityManager.merge(drone);
+        drone.setDroneStatus(DroneStatus.AVAILABLE);
+
+    }
+
+    private Drone findById(String id) throws DroneNotFoundException {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Drone> criteria = builder.createQuery(Drone.class);
         Root<Drone> root = criteria.from(Drone.class);
@@ -111,31 +131,10 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
 
         TypedQuery<Drone> query = entityManager.createQuery(criteria);
         try {
-            return Optional.of(query.getSingleResult());
+            return query.getSingleResult();
         } catch (NoResultException e) {
             log.log(Level.FINEST, "No result for [" + id + "]", e);
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public void putDroneInRevision(String droneId) throws DroneNotFoundException {
-        setDroneStatus(droneId, DroneStatus.ON_REPAIR);
-    }
-
-    @Override
-    public void setDroneAvailable(String droneId) throws DroneNotFoundException {
-        setDroneStatus(droneId, DroneStatus.AVAILABLE);
-    }
-
-    private void setDroneStatus(String droneId, DroneStatus droneStatus) throws DroneNotFoundException {
-        Optional<Drone> optdrone = findById(droneId);
-        if (optdrone.isPresent()) {
-            Drone drone = optdrone.get();
-            drone = entityManager.merge(drone);
-            drone.setDroneStatus(droneStatus);
-        } else {
-            throw new DroneNotFoundException(droneId);
+            throw new DroneNotFoundException(id);
         }
     }
 }
