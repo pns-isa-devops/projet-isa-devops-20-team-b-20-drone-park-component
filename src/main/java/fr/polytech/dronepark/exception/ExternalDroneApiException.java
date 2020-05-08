@@ -21,6 +21,6 @@ public class ExternalDroneApiException extends Exception implements Serializable
 
     @Override
     public String toString() {
-        return "ExternalDroneApiException on " + getMessage() + " ->" + getCause().toString();
+        return "ExternalDroneApiException on " + getMessage() + " ->" + getCause();
     }
 }

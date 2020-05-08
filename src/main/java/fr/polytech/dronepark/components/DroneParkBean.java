@@ -125,10 +125,11 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
     }
 
     private void setDroneStatus(String droneId, DroneStatus droneStatus) throws DroneNotFoundException {
-        if (findById(droneId).isPresent()) {
-            Drone drone = findById(droneId).get();
+        Optional<Drone> optdrone = findById(droneId);
+        if (optdrone.isPresent()) {
+            Drone drone = optdrone.get();
+            drone = entityManager.merge(drone);
             drone.setDroneStatus(droneStatus);
-            entityManager.persist(drone);
         } else {
             throw new DroneNotFoundException(droneId);
         }
