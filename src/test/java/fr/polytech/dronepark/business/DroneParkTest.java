@@ -60,9 +60,6 @@ public class DroneParkTest extends AbstractDroneParkTest {
         utx.begin();
         drone = entityManager.merge(drone);
         entityManager.remove(drone);
-        /*
-         * delivery = entityManager.merge(delivery); entityManager.remove(delivery);
-         */
         utx.commit();
     }
 
@@ -72,7 +69,6 @@ public class DroneParkTest extends AbstractDroneParkTest {
         // Create a delivery
         delivery = new Delivery("DELIVERY22");
         delivery.setParcel(new Parcel("123456789A", "Rue test", "DHS", "AlexHey"));
-        // entityManager.persist(delivery);
     }
 
     private void initMock() throws ExternalDroneApiException, DroneNotAvailableException {
