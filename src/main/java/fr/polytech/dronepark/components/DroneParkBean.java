@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 @Stateless
 public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneReviewer {
 
-    private static final Logger log = Logger.getLogger(Logger.class.getName());
+    private static final Logger log = Logger.getLogger(DroneParkBean.class.getName());
     @EJB
     DroneScheduler scheduler;
     @PersistenceContext
