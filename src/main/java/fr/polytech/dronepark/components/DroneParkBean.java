@@ -6,9 +6,7 @@ import fr.polytech.dronepark.exception.ExternalDroneApiException;
 import fr.polytech.dronepark.exception.InvalidDroneIDException;
 import fr.polytech.dronepark.utils.DroneAPI;
 import fr.polytech.dronepark.utils.DroneScheduler;
-import fr.polytech.entities.Delivery;
-import fr.polytech.entities.Drone;
-import fr.polytech.entities.DroneStatus;
+import fr.polytech.entities.*;
 import org.apache.cxf.common.i18n.UncheckedException;
 
 import javax.annotation.PostConstruct;
@@ -83,8 +81,14 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
 
     @Override
     public void addDrone(String droneId) throws InvalidDroneIDException {
-        Long nb = (Long) entityManager.createQuery("select count(d) from Drone d where d.droneId='" + droneId + "'")
-                .getSingleResult();
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
+        Root<Drone> root = criteria.from(Drone.class);
+        criteria.select(builder.count(criteria.from(Drone.class)));
+        criteria.where(builder.equal(root.get("droneId"), droneId));
+
+        Long nb = entityManager.createQuery(criteria).getSingleResult();
 
         if (nb == 0) {
             Drone drone = new Drone(droneId);
