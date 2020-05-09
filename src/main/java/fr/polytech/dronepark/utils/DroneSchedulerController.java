@@ -38,6 +38,7 @@ public class DroneSchedulerController {
             Delivery currentDelivery = entityManager.merge(drone.getCurrentDelivery());
             if (status == DeliveryStatus.FAILED || status == DeliveryStatus.DELIVERED) {
                 it.remove();
+                drone.setFlightTime(drone.getFlightTime() + 1);
                 currentDelivery.setStatus(status);
                 drone.setCurrentDelivery(null);
                 drone.setDroneStatus(DroneStatus.AVAILABLE);
