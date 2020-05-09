@@ -1,5 +1,6 @@
 package fr.polytech.dronepark.utils;
 
+import fr.polytech.dronepark.exception.DroneNotAvailableException;
 import fr.polytech.dronepark.exception.ExternalDroneApiException;
 import fr.polytech.entities.Delivery;
 import fr.polytech.entities.DeliveryStatus;
@@ -60,10 +61,10 @@ public class DroneAPI {
     }
 
     public boolean launchDrone(Drone drone, GregorianCalendar launchHour, Delivery delivery)
-            throws ExternalDroneApiException {
+            throws ExternalDroneApiException, DroneNotAvailableException {
         DroneStatus status = getDroneStatus(drone);
         if (status != null && status != DroneStatus.AVAILABLE) {
-            return false;
+            throw new DroneNotAvailableException(drone.getDroneId());
         }
         String launchHourString = launchHour.get(GregorianCalendar.HOUR) + ":"
                 + launchHour.get(GregorianCalendar.MINUTE);

@@ -64,17 +64,15 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
      * @throws Exception
      */
     @Override
-    public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour, Delivery deliv)
+    public void initializeDroneLaunching(Drone d, GregorianCalendar launchHour, Delivery deliv)
             throws ExternalDroneApiException, DroneNotAvailableException {
         Drone drone = entityManager.merge(d);
         Delivery delivery = entityManager.merge(deliv);
-        boolean status;
         // Call the dotnet API
-        status = this.droneAPI.launchDrone(drone, launchHour, delivery);
+        this.droneAPI.launchDrone(drone, launchHour, delivery);
         scheduler.add(drone);
         drone.setDroneStatus(DroneStatus.ON_DELIVERY);
         drone.setCurrentDelivery(delivery);
-        return status;
     }
 
     @PostConstruct
