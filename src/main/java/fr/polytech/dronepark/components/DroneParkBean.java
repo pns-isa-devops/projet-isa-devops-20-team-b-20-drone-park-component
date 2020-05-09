@@ -22,6 +22,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +36,17 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
     @PersistenceContext
     private EntityManager entityManager;
     private DroneAPI droneAPI;
+
+    @Override
+    public List<Drone> getDrones() {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Drone> criteria = builder.createQuery(Drone.class);
+        Root<Drone> root = criteria.from(Drone.class);
+        criteria.select(root);
+        TypedQuery<Drone> query = entityManager.createQuery(criteria);
+        List<Drone> drones = query.getResultList();
+        return drones;
+    }
 
     @Override
     public void useDroneParkReference(DroneAPI dronepark) {
