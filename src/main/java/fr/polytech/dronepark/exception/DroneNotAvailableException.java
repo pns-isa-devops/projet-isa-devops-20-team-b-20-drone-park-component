@@ -14,7 +14,7 @@ public class DroneNotAvailableException extends Exception implements Serializabl
 
     @Override
     public String getMessage() {
-        return "Drone "+droneId+" is not available.";
+        return "Drone " + droneId + " is not available.";
     }
 
 }

@@ -1,9 +1,6 @@
 package fr.polytech.dronepark.components;
 
-import fr.polytech.dronepark.exception.DroneNotAvailableException;
-import fr.polytech.dronepark.exception.DroneNotFoundException;
-import fr.polytech.dronepark.exception.ExternalDroneApiException;
-import fr.polytech.dronepark.exception.InvalidDroneIDException;
+import fr.polytech.dronepark.exception.*;
 import fr.polytech.dronepark.utils.DroneAPI;
 import fr.polytech.dronepark.utils.DroneScheduler;
 import fr.polytech.entities.Delivery;
@@ -65,7 +62,7 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
      */
     @Override
     public boolean initializeDroneLaunching(Drone d, GregorianCalendar launchHour, Delivery deliv)
-            throws ExternalDroneApiException, DroneNotAvailableException {
+            throws ExternalDroneApiException {
         Drone drone = entityManager.merge(d);
         Delivery delivery = entityManager.merge(deliv);
         boolean status;
@@ -112,16 +109,22 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
     }
 
     @Override
-    public void setDroneInCharge(String droneId) throws DroneNotFoundException {
+    public void setDroneInCharge(String droneId) throws DroneNotFoundException, DroneCannotChangeStateException {
         Drone drone = this.findById(droneId);
         drone = entityManager.merge(drone);
+        if(drone.getDroneStatus() != DroneStatus.AVAILABLE){
+            throw new DroneCannotChangeStateException(drone.getDroneId(), drone.getDroneStatus());
+        }
         drone.setDroneStatus(DroneStatus.ON_CHARGE);
     }
 
     @Override
-    public void putDroneInRevision(String droneId) throws DroneNotFoundException {
+    public void putDroneInRevision(String droneId) throws DroneNotFoundException, DroneCannotChangeStateException {
         Drone drone = this.findById(droneId);
         drone = entityManager.merge(drone);
+        if(drone.getDroneStatus() != DroneStatus.AVAILABLE){
+            throw new DroneCannotChangeStateException(drone.getDroneId(), drone.getDroneStatus());
+        }
         drone.setDroneStatus(DroneStatus.ON_REPAIR);
         drone.setFlightTime(0);
     }

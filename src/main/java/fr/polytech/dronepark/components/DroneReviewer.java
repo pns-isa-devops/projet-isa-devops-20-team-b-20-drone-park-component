@@ -1,5 +1,6 @@
 package fr.polytech.dronepark.components;
 
+import fr.polytech.dronepark.exception.DroneCannotChangeStateException;
 import fr.polytech.dronepark.exception.DroneNotFoundException;
 import fr.polytech.dronepark.exception.InvalidDroneIDException;
 import fr.polytech.entities.Drone;
@@ -26,14 +27,14 @@ public interface DroneReviewer {
      * @param droneId
      * @return
      */
-    void setDroneInCharge(String droneId)throws DroneNotFoundException;
+    void setDroneInCharge(String droneId) throws DroneNotFoundException, DroneCannotChangeStateException;
 
     /**
      * Set the drone with the id "drone_id" in repair state
      * @param droneId
      * @return
      */
-    void putDroneInRevision(String droneId)throws DroneNotFoundException;
+    void putDroneInRevision(String droneId) throws DroneNotFoundException, DroneCannotChangeStateException;
 
     /**
      * Set the drone with the id "drone_id" in available state
