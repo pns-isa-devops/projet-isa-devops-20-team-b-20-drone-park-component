@@ -34,7 +34,7 @@ public class DroneScheduler {
         controller.add(d, entityManager);
     }
 
-    @Schedule(hour = "*", minute = "*", second = "1")
+    @Schedule(hour = "*", minute = "*", second = "*/1")
     public void processReturn() throws ExternalDroneApiException {
         controller.runProcess(entityManager);
     }
