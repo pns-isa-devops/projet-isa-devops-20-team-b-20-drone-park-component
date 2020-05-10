@@ -21,7 +21,7 @@ public interface DroneLauncher {
      * @throws ExternalDroneApiException
      * @throws DroneNotAvailableException
      */
-    boolean initializeDroneLaunching(Drone drone, GregorianCalendar launchHour, Delivery delivery)
+    void initializeDroneLaunching(Drone drone, GregorianCalendar launchHour, Delivery delivery)
             throws ExternalDroneApiException, DroneNotAvailableException;
 
 }
