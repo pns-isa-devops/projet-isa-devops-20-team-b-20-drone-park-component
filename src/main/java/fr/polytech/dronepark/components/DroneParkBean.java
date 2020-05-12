@@ -117,7 +117,7 @@ public class DroneParkBean implements DroneLauncher, ControlledDrone, DroneRevie
     }
 
     @Override
-    public void putDroneInRevision(String droneId) throws DroneNotFoundException, DroneCannotChangeStateException {
+    public void setDroneInRevision(String droneId) throws DroneNotFoundException, DroneCannotChangeStateException {
         Drone drone = this.findById(droneId);
         drone = entityManager.merge(drone);
         if (drone.getDroneStatus() != DroneStatus.AVAILABLE) {
