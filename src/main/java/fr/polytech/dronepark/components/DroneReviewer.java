@@ -18,14 +18,14 @@ public interface DroneReviewer {
 
     /**
      * Returns the list of added drones.
-     * 
+     *
      * @return a list of drones.
      */
     List<Drone> getDrones();
 
     /**
      * Set the drone with the id "drone_id" in charge state
-     * 
+     *
      * @param droneId
      * @return
      */
@@ -33,15 +33,15 @@ public interface DroneReviewer {
 
     /**
      * Set the drone with the id "drone_id" in repair state
-     * 
+     *
      * @param droneId
      * @return
      */
-    void setDroneInRevision(String droneId) throws DroneNotFoundException, DroneCannotChangeStateException;
+    void putDroneInRevision(String droneId) throws DroneNotFoundException, DroneCannotChangeStateException;
 
     /**
      * Set the drone with the id "drone_id" in available state
-     * 
+     *
      * @param droneId
      * @return
      */
