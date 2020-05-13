@@ -52,7 +52,7 @@ public class DroneReviewerTest extends AbstractDroneParkTest {
         drone = entityManager.merge(drone);
         drone.setFlightTime(10);
         drone = entityManager.merge(drone);
-        droneReviewer.setDroneInRevision(drone.getDroneId());
+        droneReviewer.putDroneInRevision(drone.getDroneId());
         assertEquals(DroneStatus.ON_REPAIR, drone.getDroneStatus());
         assertEquals(0, drone.getFlightTime());
 
@@ -63,25 +63,25 @@ public class DroneReviewerTest extends AbstractDroneParkTest {
             throws DroneNotFoundException, DroneCannotChangeStateException {
         drone = entityManager.merge(drone);
         droneReviewer.setDroneInCharge(drone.getDroneId());
-        assertThrows(DroneCannotChangeStateException.class, () -> droneReviewer.setDroneInRevision(drone.getDroneId()));
+        assertThrows(DroneCannotChangeStateException.class, () -> droneReviewer.putDroneInRevision(drone.getDroneId()));
         assertThrows(DroneCannotChangeStateException.class, () -> droneReviewer.setDroneInCharge(drone.getDroneId()));
 
         droneReviewer.setDroneAvailable(drone.getDroneId());
 
-        droneReviewer.setDroneInRevision(drone.getDroneId());
-        assertThrows(DroneCannotChangeStateException.class, () -> droneReviewer.setDroneInRevision(drone.getDroneId()));
+        droneReviewer.putDroneInRevision(drone.getDroneId());
+        assertThrows(DroneCannotChangeStateException.class, () -> droneReviewer.putDroneInRevision(drone.getDroneId()));
         assertThrows(DroneCannotChangeStateException.class, () -> droneReviewer.setDroneInCharge(drone.getDroneId()));
 
         droneReviewer.getDrones().get(0).setDroneStatus(DroneStatus.ON_DELIVERY);
 
-        assertThrows(DroneCannotChangeStateException.class, () -> droneReviewer.setDroneInRevision(drone.getDroneId()));
+        assertThrows(DroneCannotChangeStateException.class, () -> droneReviewer.putDroneInRevision(drone.getDroneId()));
         assertThrows(DroneCannotChangeStateException.class, () -> droneReviewer.setDroneInCharge(drone.getDroneId()));
     }
 
     @Test
     public void setDroneAvailable() throws DroneNotFoundException, DroneCannotChangeStateException {
         drone = entityManager.merge(drone);
-        droneReviewer.setDroneInRevision(drone.getDroneId());
+        droneReviewer.putDroneInRevision(drone.getDroneId());
         droneReviewer.setDroneAvailable(drone.getDroneId());
         assertEquals(DroneStatus.AVAILABLE, drone.getDroneStatus());
     }
