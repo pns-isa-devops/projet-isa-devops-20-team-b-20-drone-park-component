@@ -37,7 +37,7 @@ public interface DroneReviewer {
      * @param droneId
      * @return
      */
-    void setDroneInRevision(String droneId) throws DroneNotFoundException, DroneCannotChangeStateException;
+    void putDroneInRevision(String droneId) throws DroneNotFoundException, DroneCannotChangeStateException;
 
     /**
      * Set the drone with the id "drone_id" in available state
